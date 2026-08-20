@@ -71,8 +71,7 @@ if [ ! -f "${BENCH_DIR}/sites/${SITE_NAME}/site_config.json" ]; then
     --admin-password "${ADMIN_PASSWORD}" \
     --db-host "${DB_HOST}" \
     --db-port "${DB_PORT}" \
-    --no-mariadb-socket \
-    --skip-assets
+    --no-mariadb-socket
 fi
 
 if ! bench --site "${SITE_NAME}" list-apps | awk '{print $1}' | grep -qx "crm"; then
