@@ -3,8 +3,9 @@ FROM frappe/bench:latest
 USER root
 
 WORKDIR /workspace
-COPY . /workspace
-RUN chmod +x /workspace/scripts/railway-start.sh
-RUN chown -R frappe:frappe /workspace
+COPY . /workspace/crm
+COPY scripts/railway-start.sh /workspace/scripts/railway-start.sh
+RUN chmod +x /workspace/scripts/railway-start.sh \
+    && chown -R frappe:frappe /workspace
 
 USER frappe
