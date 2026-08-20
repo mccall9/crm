@@ -5,5 +5,6 @@ USER root
 WORKDIR /workspace
 COPY . /workspace
 RUN chmod +x /workspace/scripts/railway-start.sh
+RUN chown -R frappe:frappe /workspace
 
 USER frappe
