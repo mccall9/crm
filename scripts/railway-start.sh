@@ -69,7 +69,7 @@ cd "${BENCH_DIR}"
 # compatible and idempotent without changing the CRM source tree.
 FRAPPE_META="${BENCH_DIR}/apps/frappe/frappe/model/meta.py"
 if [ -f "${FRAPPE_META}" ]; then
-  sed -i 's/self\\.istable/getattr(self, "istable", False)/g' "${FRAPPE_META}"
+  sed -i 's/self\.istable/getattr(self, "istable", False)/g' "${FRAPPE_META}"
 fi
 
 # Keep the global app registry aligned with the app names in this repository.
