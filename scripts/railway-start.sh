@@ -114,9 +114,13 @@ fi
 mkdir -p /workspace/logs "${BENCH_DIR}/logs"
 
 printf 'Synchronizing missing Frappe core DocTypes on existing site\n'
-PYTHONPATH="${BENCH_DIR}/apps${PYTHONPATH:+:${PYTHONPATH}}" \
-  "${BENCH_DIR}/env/bin/python" "${APP_SOURCE}/scripts/sync-frappe-core.py" \
-  "${SITE_NAME}" "${BENCH_DIR}/sites"
+(
+  cd "${BENCH_DIR}/sites"
+  FRAPPE_STREAM_LOGGING=1 \
+    PYTHONPATH="${BENCH_DIR}/apps${PYTHONPATH:+:${PYTHONPATH}}" \
+    "${BENCH_DIR}/env/bin/python" "${APP_SOURCE}/scripts/sync-frappe-core.py" \
+    "${SITE_NAME}" "${BENCH_DIR}/sites"
+)
 
 printf 'Running Frappe migrations on existing site\n'
 bench --site "${SITE_NAME}" migrate
