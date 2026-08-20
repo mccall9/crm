@@ -72,6 +72,11 @@ if [ -f "${FRAPPE_META}" ]; then
   sed -i 's/self\.istable/getattr(self, "istable", False)/g' "${FRAPPE_META}"
 fi
 
+FRAPPE_CREATE_NEW="${BENCH_DIR}/apps/frappe/frappe/model/create_new.py"
+if [ -f "${FRAPPE_CREATE_NEW}" ]; then
+  sed -i 's/df\.options/getattr(df, "options", None)/g' "${FRAPPE_CREATE_NEW}"
+fi
+
 # Keep the global app registry aligned with the app names in this repository.
 # This also removes stale entries such as the former `frappecrm` name.
 printf '%s\n' frappe crm > "${BENCH_DIR}/sites/apps.txt"
