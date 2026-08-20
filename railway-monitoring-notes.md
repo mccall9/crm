@@ -40,3 +40,11 @@ The index-clause patch deployment reached a new traceback marker at `2026-08-20 
 ## Precise correction for `f5580481`
 
 The latest traceback confirms the previous patch targeted the wrong file. The generated SQL still contains `ADD INDEX IF NOT EXISTS` from `/workspace/frappe-bench/apps/frappe/frappe/database/mariadb/mysqlclient.py` (the method is at line 455), while the patcher changed `mariadb/schema.py`, which does not contain the index helper. The fix must target `mysqlclient.py` so the replacement is applied in the Bench used by Railway.
+
+## Deployment `8d1495a5`
+
+The real-client MariaDB patch is now being used: the latest visible log reached `frappe.db.updatedb(self.name, Meta(self))`, rather than failing immediately on the previous `ADD INDEX IF NOT EXISTS` SQL. The next browser refresh reset before showing the final traceback, so the exact remaining issue is still pending log capture. MySQL and Redis remain online.
+
+## New failure in `8d1495a5`
+
+The index patch worked: the traceback moved past `DocShare` and now fails in Frappe's sequence creation. The exact database error is `MySQLdb.ProgrammingError: (1064, ... near 'sequence if not exists web_form_sequence ...')`; the generated SQL is `CREATE SEQUENCE IF NOT EXISTS web_form_sequence ...`. MariaDB rejects this `IF NOT EXISTS` form. The next targeted patch should remove `IF NOT EXISTS` from the MariaDB sequence helper, which already runs only for missing sequences.
