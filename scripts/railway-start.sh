@@ -18,6 +18,12 @@ REDIS_PORT="${REDIS_PORT:-${REDISPORT:-6379}}"
 BENCH_DIR="${BENCH_DIR:-/workspace/frappe-bench}"
 APP_SOURCE="${APP_SOURCE:-/workspace/crm}"
 FRAPPE_BRANCH="${FRAPPE_BRANCH:-version-15}"
+PYTHON_BIN="${PYTHON_BIN:-/home/frappe/.pyenv/versions/${PYTHON_VERSION_PREV:-3.12.12}/bin/python3}"
+
+if [ ! -x "${PYTHON_BIN}" ]; then
+  printf 'Required Python interpreter not found: %s\n' "${PYTHON_BIN}" >&2
+  exit 1
+fi
 
 wait_for_tcp() {
   local host="$1"
@@ -40,8 +46,16 @@ wait_for_tcp() {
 wait_for_tcp "$DB_HOST" "$DB_PORT" "MariaDB"
 wait_for_tcp "$REDIS_HOST" "$REDIS_PORT" "Redis"
 
+if [ -x "${BENCH_DIR}/env/bin/python" ]; then
+  BENCH_PYTHON_VERSION="$(${BENCH_DIR}/env/bin/python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+  if [ "${BENCH_PYTHON_VERSION}" != "3.12" ]; then
+    rm -rf "${BENCH_DIR}"
+  fi
+fi
+
 if [ ! -d "${BENCH_DIR}/apps/frappe" ]; then
   bench init \
+    --python "${PYTHON_BIN}" \
     --skip-assets \
     --skip-redis-config-generation \
     --version "${FRAPPE_BRANCH}" \
