@@ -20,6 +20,7 @@ OPTIONAL_FIELDS = {
     "title_field",
     "istable",
     "ignore_user_permissions",
+    "is_submittable",
 }
 
 
