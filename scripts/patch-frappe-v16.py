@@ -207,6 +207,10 @@ def main() -> int:
                     'if frappe.flags.in_install == "frappe":\n\t\t\treturn',
                     'if frappe.flags.in_install == "frappe" or (frappe.flags.in_install and not frappe.db.table_exists("Workflow")):\n\t\t\treturn',
                 ),
+                (
+                    "\t\tall_rows = self.get(df.fieldname)",
+                    "\t\tall_rows = self.get(df.fieldname) or []",
+                ),
             ],
         )
 
