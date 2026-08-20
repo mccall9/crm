@@ -19,6 +19,7 @@ OPTIONAL_FIELDS = {
     "parenttype",
     "title_field",
     "istable",
+    "ignore_user_permissions",
 }
 
 
