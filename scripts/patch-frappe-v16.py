@@ -115,7 +115,7 @@ def main() -> int:
             ],
         )
 
-    mariadb_schema = frappe_dir / "database" / "mariadb" / "schema.py"
+    mariadb_schema = frappe_dir / "database" / "mariadb" / "mysqlclient.py"
     if mariadb_schema.exists():
         replace_all(
             mariadb_schema,

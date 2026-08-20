@@ -32,3 +32,11 @@ Railway still shows the deployment as in progress in the current interface, whil
 ## New schema failure in `e6cfdd3d`
 
 The TEXT/LONGTEXT/JSON default issue was bypassed. Frappe then failed while updating the core `DocShare` DocType: `MySQLdb.ProgrammingError: (1064, ... SQL syntax ... near 'IF NOT EXISTS ...')`. The failing operation is `frappe.db.add_index("DocShare", ["user", "share_doctype"])`, which generated `CREATE INDEX IF NOT EXISTS ...`; the MariaDB service rejects that syntax. The next patch should make the MariaDB index helper check for an existing index and issue a plain `CREATE INDEX` only when absent, or otherwise remove the unsupported clause.
+
+## Deployment `f5580481`
+
+The index-clause patch deployment reached a new traceback marker at `2026-08-20 11:08:40` (`~~~~~~~~~~~~~~~^^^^^^^^^^^^^`). The subsequent log refresh reset the browser to `about:blank` before showing the final exception. The latest visible state remains `Deploying`; MySQL and Redis are online.
+
+## Precise correction for `f5580481`
+
+The latest traceback confirms the previous patch targeted the wrong file. The generated SQL still contains `ADD INDEX IF NOT EXISTS` from `/workspace/frappe-bench/apps/frappe/frappe/database/mariadb/mysqlclient.py` (the method is at line 455), while the patcher changed `mariadb/schema.py`, which does not contain the index helper. The fix must target `mysqlclient.py` so the replacement is applied in the Bench used by Railway.
