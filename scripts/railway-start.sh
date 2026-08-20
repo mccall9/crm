@@ -16,7 +16,7 @@ REDIS_PORT="${REDIS_PORT:-${REDISPORT:-6379}}"
 : "${PORT:?PORT is required}"
 
 BENCH_DIR="${BENCH_DIR:-/workspace/frappe-bench}"
-APP_SOURCE="${APP_SOURCE:-/workspace}"
+APP_SOURCE="${APP_SOURCE:-/workspace/crm}"
 FRAPPE_BRANCH="${FRAPPE_BRANCH:-version-15}"
 
 if [ ! -d "${BENCH_DIR}/apps/frappe" ]; then
@@ -45,11 +45,16 @@ fi
 if [ ! -f "${BENCH_DIR}/sites/${SITE_NAME}/site_config.json" ]; then
   bench new-site "${SITE_NAME}" --force --mariadb-root-password "${DB_ROOT_PASSWORD}" --admin-password "${ADMIN_PASSWORD}" --db-host "${DB_HOST}" --db-port "${DB_PORT}" --no-mariadb-socket --skip-assets
 
-  bench --site "${SITE_NAME}" install-app crm
-  bench --site "${SITE_NAME}" set-config developer_mode 0
-  bench --site "${SITE_NAME}" set-config mute_emails 1
-  bench --site "${SITE_NAME}" clear-cache
 fi
+
+if ! bench --site "${SITE_NAME}" list-apps | grep -qx "crm"; then
+  bench --site "${SITE_NAME}" install-app crm
+fi
+
+bench --site "${SITE_NAME}" set-config developer_mode 0
+bench --site "${SITE_NAME}" set-config mute_emails 1
+bench --site "${SITE_NAME}" migrate
+bench --site "${SITE_NAME}" clear-cache
 
 bench use "${SITE_NAME}"
 exec bench serve --port "${PORT}" --host 0.0.0.0 --noreload
