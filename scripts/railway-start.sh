@@ -50,19 +50,17 @@ fi
 
 cd "${BENCH_DIR}"
 
+# Keep the global app registry aligned with the app names in this repository.
+# This also removes stale entries such as the former `frappecrm` name.
+printf '%s\n' frappe crm > "${BENCH_DIR}/sites/apps.txt"
+
 bench set-mariadb-host "${DB_HOST}"
 bench set-redis-cache-host "redis://${REDIS_HOST}:${REDIS_PORT}"
 bench set-redis-queue-host "redis://${REDIS_HOST}:${REDIS_PORT}"
 bench set-redis-socketio-host "redis://${REDIS_HOST}:${REDIS_PORT}"
 
-if [ ! -f "${BENCH_DIR}/apps/crm/pyproject.toml" ]; then
-  rm -rf "${BENCH_DIR}/apps/crm"
-  cp -a "${APP_SOURCE}" "${BENCH_DIR}/apps/crm"
-fi
-
-if ! grep -qx "crm" "${BENCH_DIR}/sites/apps.txt" 2>/dev/null; then
-  printf '%s\n' "crm" >> "${BENCH_DIR}/sites/apps.txt"
-fi
+rm -rf "${BENCH_DIR}/apps/crm"
+cp -a "${APP_SOURCE}" "${BENCH_DIR}/apps/crm"
 
 bench pip install --quiet -e "${BENCH_DIR}/apps/crm"
 
