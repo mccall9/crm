@@ -79,6 +79,11 @@ if [ -f "${FRAPPE_CREATE_NEW}" ]; then
   sed -i 's/doc\.meta\.title_field/getattr(doc.meta, "title_field", None)/g' "${FRAPPE_CREATE_NEW}"
 fi
 
+PATCH_SCRIPT="${APP_SOURCE}/scripts/patch-frappe-v16.py"
+if [ -f "${PATCH_SCRIPT}" ]; then
+  "${PYTHON_BIN}" "${PATCH_SCRIPT}" "${BENCH_DIR}"
+fi
+
 # Keep the global app registry aligned with the app names in this repository.
 # This also removes stale entries such as the former `frappecrm` name.
 printf '%s\n' frappe crm > "${BENCH_DIR}/sites/apps.txt"
