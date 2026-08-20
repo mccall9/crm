@@ -34,11 +34,16 @@ bench set-redis-queue-host "redis://${REDIS_HOST}:${REDIS_PORT}"
 bench set-redis-socketio-host "redis://${REDIS_HOST}:${REDIS_PORT}"
 
 if [ ! -d "${BENCH_DIR}/apps/crm" ]; then
-  bench get-app crm "${APP_SOURCE}"
+  # bench get-app expects a git URL, but the CRM app source is already
+  # available locally (copied into /workspace by the Dockerfile), so we
+  # copy it directly into the bench apps directory instead of cloning it.
+  cp -r "${APP_SOURCE}" "${BENCH_DIR}/apps/crm"
+  echo "crm" >> "${BENCH_DIR}/sites/apps.txt"
+  pip install --quiet -e "${BENCH_DIR}/apps/crm"
 fi
 
 if [ ! -f "${BENCH_DIR}/sites/${SITE_NAME}/site_config.json" ]; then
-  bench new-site "${SITE_NAME}" --force --mariadb-root-password "${DB_ROOT_PASSWORD}" --admin-password "${ADMIN_PASSWORD}" --db-host "${DB_HOST}" --db-port "${DB_PORT}" --no-mariadb-socket
+  bench new-site "${SITE_NAME}" --force --mariadb-root-password "${DB_ROOT_PASSWORD}" --admin-password "${ADMIN_PASSWORD}" --db-host "${DB_HOST}" --db-port "${DB_PORT}" --no-mariadb-socket --skip-assets
 
   bench --site "${SITE_NAME}" install-app crm
   bench --site "${SITE_NAME}" set-config developer_mode 0
