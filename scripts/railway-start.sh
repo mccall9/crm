@@ -111,6 +111,8 @@ fi
 # The persistent site may have been interrupted after Frappe created the site
 # but before all core DocTypes were synchronized. Migrate Frappe first so
 # tables such as `tabModule Def` exist before CRM's module registration runs.
+mkdir -p /workspace/logs "${BENCH_DIR}/logs"
+
 printf 'Synchronizing missing Frappe core DocTypes on existing site\n'
 PYTHONPATH="${BENCH_DIR}/apps${PYTHONPATH:+:${PYTHONPATH}}" \
   "${BENCH_DIR}/env/bin/python" "${APP_SOURCE}/scripts/sync-frappe-core.py" \
