@@ -6,6 +6,7 @@ watchPatterns = [
   "docker/**",
   "scripts/railway-start.sh",
   "scripts/patch-frappe-v16.py",
+  "scripts/sync-frappe-core.py",
   "Dockerfile.railway",
   "railway.toml",
 ]
