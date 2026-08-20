@@ -115,6 +115,13 @@ def main() -> int:
             ],
         )
 
+    mariadb_schema = frappe_dir / "database" / "mariadb" / "schema.py"
+    if mariadb_schema.exists():
+        replace_all(
+            mariadb_schema,
+            [("ADD INDEX IF NOT EXISTS", "ADD INDEX")],
+        )
+
     schema = frappe_dir / "database" / "schema.py"
     if schema.exists():
         replace_all(

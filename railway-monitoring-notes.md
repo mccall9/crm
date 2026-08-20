@@ -20,3 +20,15 @@ The new container reaches the helper after creating the log directories, but `sy
 ## Deployment `10954b81`
 
 The latest deployment reached the container and displayed a new traceback marker at `2026-08-20 11:00:56` (`~~~~~~~~~~~~~~~~~~~~~~~~~~^^`). The browser log view then reset to `about:blank`, so the full exception line was not captured in the rendered output. The service remains under investigation; no site recreation or frontend deployment has occurred.
+
+## Deployment `e6cfdd3d`
+
+The MariaDB-default patch deployment reached a later Frappe document hook at `2026-08-20 11:04:47`; the previous `onboarding_status` schema error is no longer the first visible event. The next browser refresh reset to `about:blank` before exposing the final exception, so the saved Railway HTML/log data must be parsed for the exact new failure.
+
+## Follow-up on `e6cfdd3d`
+
+Railway still shows the deployment as in progress in the current interface, while the immediately prior deployment `10954b81` is marked failed. The current log panel is loading again and has not exposed the final traceback after the MariaDB-default patch. No new code change has been made since commit `c60da183`.
+
+## New schema failure in `e6cfdd3d`
+
+The TEXT/LONGTEXT/JSON default issue was bypassed. Frappe then failed while updating the core `DocShare` DocType: `MySQLdb.ProgrammingError: (1064, ... SQL syntax ... near 'IF NOT EXISTS ...')`. The failing operation is `frappe.db.add_index("DocShare", ["user", "share_doctype"])`, which generated `CREATE INDEX IF NOT EXISTS ...`; the MariaDB service rejects that syntax. The next patch should make the MariaDB index helper check for an existing index and issue a plain `CREATE INDEX` only when absent, or otherwise remove the unsupported clause.
