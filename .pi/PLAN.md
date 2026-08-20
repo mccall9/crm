@@ -6,7 +6,127 @@
 
 ---
 
-## Implementation Order
+## Product Direction — CS Workspace
+
+> **Source of truth**: [Customer Success Operational Manual](https://docs.google.com/document/d/1vqkdODjcZNOXOdZVGpA5jiWhMVVBB7dKccKJaS1qgrE/edit)
+
+### Product goal
+
+Turn CRM into a personal operating workspace for the Customer Success role at Atlas
+Assessoria. The product should make the CS's daily work visible and actionable:
+prepare onboarding, schedule and run meetings, track commitments, centralize client
+context, and close the five-week cycle with results and NPS.
+
+### Scope decision
+
+**In the initial scope**
+
+- Clients and account context: contacts, squad members, communication channels,
+  Drive link, onboarding form, access status, current cycle and health notes.
+- A CS task workspace based on the operational playbook: pre-onboarding, onboarding,
+  week 1, weeks 2–5, ad-hoc demands, results presentation and NPS.
+- Google Calendar integration as the first external integration:
+  - connect the CS's Google account with OAuth;
+  - list the CS's calendar events and availability;
+  - create, update and cancel meetings from the CRM;
+  - invite the client and the required squad members;
+  - create a Google Meet link when scheduling;
+  - enforce business-day and 09:00–18:00 scheduling rules;
+  - use the naming convention from the manual, for example
+    `ATL | REUNIÃO DE ONBOARDING [CS+EST+GP] [NOME DO CLIENTE]`;
+  - store the provider event ID and sync status to avoid duplicate events.
+- Meeting records: agenda, participants, notes, recording/transcript links,
+  decisions and next steps.
+- Basic operational visibility: overdue tasks, blocked tasks, upcoming meetings,
+  missing client inputs and cycle health.
+
+**Explicitly out of scope for now**
+
+- Sales or service pipelines, kanban stages and lead cards.
+- Lead automations, WhatsApp/CRM connection flows and hunter queue management.
+- Campaign management, ads optimization and revenue attribution.
+- Replacing Google Calendar or ClickUp as external systems before the first usable
+  calendar-centered version is validated.
+
+### Product roadmap
+
+#### Phase 0 — Validate the CS workflow
+
+- Confirm the minimum client, meeting and task fields against the operational manual.
+- Map the 5-week playbook into reusable task templates with due-date rules.
+- Define the first dashboard: today's agenda, overdue items, blocked items and next
+  client actions.
+- Decide where the first version records notes and links (CRM only, with Drive links).
+
+**Exit criteria:** one complete client journey can be represented from pre-onboarding
+through the results/NPS closeout without creating a pipeline.
+
+#### Phase 1 — Client and playbook foundation
+
+- Add the CS client/account workspace and operational status.
+- Add reusable playbook templates for:
+  - pre-onboarding;
+  - onboarding meeting;
+  - week 1 technical/access work;
+  - weeks 2–4 follow-up and reporting;
+  - week 5 results and NPS;
+  - ad-hoc requests and extraordinary meetings.
+- Support task ownership, due dates, status (`Not started`, `In progress`,
+  `Blocked`, `Done`, `Cancelled`) and mandatory blocker/late notes.
+- Preserve an activity history for task and client changes.
+
+**Exit criteria:** the CS can open a client and know what is due, blocked or next.
+
+#### Phase 2 — Google Calendar integration
+
+- **Prerequisite:** configure a Google OAuth application and Calendar scopes in
+  the Frappe site (`Social Login Key` or a dedicated provider); client credentials
+  must never be stored in the frontend or committed to the repository.
+- Add Google OAuth connection and token lifecycle handling.
+- Add calendar selection and availability lookup.
+- Add a meeting scheduler with client/squad participants, duration, business-hour
+  validation, timezone handling and Google Meet generation.
+- Sync CRM meeting records with Google Calendar using the stored provider event ID.
+- Handle provider errors visibly; never create a local “success” state when Google
+  rejects the event.
+- Add reschedule, cancellation and conflict feedback.
+
+**Exit criteria:** an onboarding or ad-hoc meeting created in CRM appears correctly
+in Google Calendar with invitees and meeting link, and edits remain synchronized.
+
+#### Phase 3 — Meeting execution and cycle control
+
+- Add meeting preparation checklist and agenda templates.
+- Record participants, notes, decisions, next steps and links to recording/transcript.
+- Add cycle timeline and weekly checkpoints.
+- Add results presentation and NPS follow-up tasks.
+- Add reminders for upcoming meetings, overdue tasks and missing client inputs.
+
+**Exit criteria:** the CS can run and document an entire five-week cycle from one
+client workspace.
+
+#### Phase 4 — Operational dashboard and refinement
+
+- Add CS-level overview of active clients, health, next action and risk signals.
+- Add filters for cycle, owner, status, due date and blocked reason.
+- Measure calendar scheduling success, overdue rate, blocked tasks and cycle closeout.
+- Validate the workflow with real CS usage before considering additional integrations.
+
+**Exit criteria:** the dashboard helps the CS prioritize the day without opening
+multiple systems for basic operational decisions.
+
+### Decisions deferred until after validation
+
+- ClickUp two-way synchronization.
+- WhatsApp integration and communication history.
+- Drive file creation and upload automation.
+- NPS provider/form integration.
+- Multi-user permissions, team-wide dashboards and role-specific workflows.
+- Any pipeline or lead-management module.
+
+---
+
+## Existing Technical Implementation Order
 
 | Order | Phase | Scope | Status |
 |---|---|---|---|

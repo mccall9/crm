@@ -16,6 +16,7 @@
   "column_break_cqua",
   "assigned_to",
   "status",
+  "cs_phase",
   "due_date",
   "section_break_bzhd",
   "description"
@@ -59,6 +60,13 @@
    "in_standard_filter": 1,
    "label": "Status",
    "options": "Backlog\nTodo\nIn Progress\nDone\nCanceled"
+  },
+  {
+   "fieldname": "cs_phase",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "CS Phase",
+   "options": "Pre-onboarding\nOnboarding\nSemana 1\nSemana 2\nSemanas 3–4\nSemana 5"
   },
   {
    "fieldname": "due_date",

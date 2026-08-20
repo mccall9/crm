@@ -37,6 +37,11 @@ const routes = [
     component: () => import('@/pages/Dashboard.vue'),
   },
   {
+    path: '/cs',
+    name: 'CS Workspace',
+    component: () => import('@/pages/CSWorkspace.vue'),
+  },
+  {
     alias: '/leads',
     path: '/leads/view/:viewType?',
     name: 'Leads',

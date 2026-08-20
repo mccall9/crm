@@ -259,6 +259,11 @@ const links = [
     condition: () => !props.mobile,
   },
   {
+    label: 'CS Workspace',
+    icon: StepsIcon,
+    to: 'CS Workspace',
+  },
+  {
     label: 'Leads',
     icon: LeadsIcon,
     to: 'Leads',

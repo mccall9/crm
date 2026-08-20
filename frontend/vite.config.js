@@ -2,11 +2,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import path from 'path'
-import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => {
   const isDev = mode === 'development'
+  const { VitePWA } = await importVitePWA()
   const config = {
     plugins: [
       vue(),
@@ -125,6 +125,22 @@ export default defineConfig(async ({ mode }) => {
 
   return config
 })
+
+async function importVitePWA() {
+  const hasDirname = Object.prototype.hasOwnProperty.call(
+    globalThis,
+    '__dirname',
+  )
+  const dirname = globalThis.__dirname
+
+  if (hasDirname) delete globalThis.__dirname
+
+  try {
+    return await import('vite-plugin-pwa')
+  } finally {
+    if (hasDirname) globalThis.__dirname = dirname
+  }
+}
 
 async function importFrappeUIPlugin(isDev, config) {
   if (isDev) {
