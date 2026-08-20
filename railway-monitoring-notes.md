@@ -16,3 +16,7 @@ The latest backend-only deployment, triggered by commit `b281d95c`, is still rep
 ## Latest deployment `8a9fd700`
 
 The new container reaches the helper after creating the log directories, but `sync-frappe-core.py` still fails inside `frappe.connect()` at `frappe.database.get_db()`. The visible trace is truncated before the final exception, so the next step is to retrieve the complete deployment log and identify whether the remaining issue is site configuration, database host/socket selection, or another missing core table. MySQL and Redis are reachable according to the bootstrap output.
+
+## Deployment `10954b81`
+
+The latest deployment reached the container and displayed a new traceback marker at `2026-08-20 11:00:56` (`~~~~~~~~~~~~~~~~~~~~~~~~~~^^`). The browser log view then reset to `about:blank`, so the full exception line was not captured in the rendered output. The service remains under investigation; no site recreation or frontend deployment has occurred.

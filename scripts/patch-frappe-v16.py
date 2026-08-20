@@ -115,6 +115,18 @@ def main() -> int:
             ],
         )
 
+    schema = frappe_dir / "database" / "schema.py"
+    if schema.exists():
+        replace_all(
+            schema,
+            [
+                (
+                    '\t\telif (\n\t\t\tself.default\n\t\t\tand (self.default not in frappe.db.DEFAULT_SHORTCUTS)\n\t\t\tand not cstr(self.default).startswith(":")\n\t\t):\n\t\t\tdefault = frappe.db.escape(self.default)',
+                    '\t\telif (\n\t\t\tself.default\n\t\t\tand (self.default not in frappe.db.DEFAULT_SHORTCUTS)\n\t\t\tand not cstr(self.default).startswith(":")\n\t\t):\n\t\t\t# MariaDB rejects defaults on TEXT/LONGTEXT/JSON columns.\n\t\t\tif column_def in ("text", "longtext", "json"):\n\t\t\t\tdefault = None\n\t\t\telse:\n\t\t\t\tdefault = frappe.db.escape(self.default)',
+                ),
+            ],
+        )
+
     base_document = frappe_dir / "model" / "base_document.py"
     if base_document.exists():
         patch_base_document(base_document)
