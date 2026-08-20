@@ -48,7 +48,16 @@ def main() -> int:
 
     meta = frappe_dir / "model" / "meta.py"
     if meta.exists():
-        replace_all(meta, [("self.istable", 'getattr(self, "istable", False)')])
+        replace_all(
+            meta,
+            [
+                ("self.istable", 'getattr(self, "istable", False)'),
+                (
+                    "if (frappe.flags.in_install or frappe.flags.in_migrate) and self.name in self.special_doctypes:",
+                    "if (frappe.flags.in_install or frappe.flags.in_migrate) and self.name in self.special_doctypes and frappe.db.table_exists(self.name):",
+                ),
+            ],
+        )
 
     create_new = frappe_dir / "model" / "create_new.py"
     if create_new.exists():
