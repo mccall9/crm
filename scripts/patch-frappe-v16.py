@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply narrow, idempotent compatibility fixes to the Frappe v16 runtime.
+"""Apply narrow, idempotent compatibility fixes to the generated Frappe v16 Bench.
 
 The CRM develop branch currently uses DocType metadata fields that the
 version-16 Frappe branch accesses without defaults while installing special
@@ -23,8 +23,13 @@ OPTIONAL_FIELDS = {
     "is_submittable",
 }
 
-
-BASE_DOCUMENT_FALLBACK = '''\n\tdef __getattr__(self, key):\n\t\tif key in OPTIONAL_FIELDS:\n\t\t\treturn None\n\t\traise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")\n'''
+BASE_DOCUMENT_FALLBACK = (
+    "\n\tdef __getattr__(self, key):"
+    "\n\t\tif key in self.OPTIONAL_FIELDS:"
+    "\n\t\t\treturn None"
+    "\n\t\traise AttributeError(f\"'{type(self).__name__}' object has no attribute '{key}'\")"
+    "\n"
+)
 
 
 def replace_all(path: Path, replacements: list[tuple[str, str]]) -> None:
@@ -34,6 +39,33 @@ def replace_all(path: Path, replacements: list[tuple[str, str]]) -> None:
         updated = updated.replace(old, new)
     if updated != text:
         path.write_text(updated)
+
+
+def patch_base_document(path: Path) -> None:
+    text = path.read_text()
+    class_marker = "class BaseDocument:\n"
+    if class_marker not in text:
+        return
+
+    attr_line = "\tOPTIONAL_FIELDS = " + repr(OPTIONAL_FIELDS)
+    lines = text.splitlines(keepends=True)
+    attr_index = next((i for i, line in enumerate(lines) if "OPTIONAL_FIELDS =" in line), None)
+    if attr_index is None:
+        insert_at = next(i for i, line in enumerate(lines) if line == class_marker) + 1
+        lines.insert(insert_at, attr_line + "\n")
+        text = "".join(lines)
+    else:
+        line = lines[attr_index]
+        newline = "\n" if line.endswith("\n") else ""
+        lines[attr_index] = attr_line + newline
+        text = "".join(lines)
+
+    if "def __getattr__(self, key)" not in text:
+        text = text.replace(class_marker, class_marker + BASE_DOCUMENT_FALLBACK, 1)
+    else:
+        text = text.replace("if key in OPTIONAL_FIELDS:", "if key in self.OPTIONAL_FIELDS:")
+
+    path.write_text(text)
 
 
 def main() -> int:
@@ -72,29 +104,8 @@ def main() -> int:
         )
 
     base_document = frappe_dir / "model" / "base_document.py"
-    if base_document.exists() and "def __getattr__(self, key)" not in base_document.read_text():
-        text = base_document.read_text()
-        marker = "class BaseDocument:\n"
-        if marker in text:
-            text = text.replace(marker, marker + BASE_DOCUMENT_FALLBACK, 1)
-            text = text.replace(
-                "class BaseDocument:\n",
-                "class BaseDocument:\n",
-                1,
-            )
-            # Keep the optional-field set close to the fallback without
-            # introducing imports or touching application code.
-            text = text.replace(
-                "class BaseDocument:\n",
-                "class BaseDocument:\n\tOPTIONAL_FIELDS = " + repr(OPTIONAL_FIELDS) + "\n",
-                1,
-            )
-            text = text.replace(
-                "if key in OPTIONAL_FIELDS:",
-                "if key in self.OPTIONAL_FIELDS:",
-                1,
-            )
-            base_document.write_text(text)
+    if base_document.exists():
+        patch_base_document(base_document)
 
     return 0
 
