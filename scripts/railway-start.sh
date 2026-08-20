@@ -111,7 +111,10 @@ fi
 # The persistent site may have been interrupted after Frappe created the site
 # but before all core DocTypes were synchronized. Migrate Frappe first so
 # tables such as `tabModule Def` exist before CRM's module registration runs.
-printf 'Synchronizing Frappe core schema on existing site\n'
+printf 'Synchronizing missing Frappe core DocTypes on existing site\n'
+bench --site "${SITE_NAME}" execute frappe.model.sync.sync_for --args '["frappe"]'
+
+printf 'Running Frappe migrations on existing site\n'
 bench --site "${SITE_NAME}" migrate
 
 if ! bench --site "${SITE_NAME}" list-apps | awk '{print $1}' | grep -qx "crm"; then

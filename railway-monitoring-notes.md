@@ -1,8 +1,6 @@
 
-## Exact failure from deployment `a3347fd2`
+## New failure in deployment `292cd0e1`
 
-The Deploy Logs show that the workflow bypass advanced past the previous `validate_workflow()` issue. The current failure is a MySQL error while inserting the CRM module definition:
+The new bootstrap reached the migration stage but `bench --site ... migrate` failed because the partial site also lacks `tabPatch Log`. Railway logs show `frappe.database.database.TableMissingError: ('DocType', 'Patch Log')` from `frappe.model.meta.get_table_columns()` while the patch handler queried Patch Log. This confirms the site is missing multiple core tables, not just `Module Def`.
 
-`MySQLdb.ProgrammingError: (1146, "Table '...tabModule Def' doesn't exist")`
-
-The failing SQL is an `INSERT INTO tabModule Def (...) VALUES (...)` for module `FCRM`. This means the persistent site has an incomplete Frappe core schema: the `Module Def` table itself was never synchronized. The next repair must run the Frappe core schema synchronization/migration against the existing site before retrying `install-app crm`; it must not drop or recreate the site.
+The service was still marked `Deploying` at the time of capture, with MySQL and Redis online. The next non-destructive repair should invoke the Frappe core DocType synchronizer directly before `migrate`, so it can create missing core tables such as `Patch Log` and `Module Def`; no site deletion or recreation is permitted.
