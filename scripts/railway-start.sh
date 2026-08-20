@@ -47,4 +47,4 @@ if [ ! -f "${BENCH_DIR}/sites/${SITE_NAME}/site_config.json" ]; then
 fi
 
 bench use "${SITE_NAME}"
-exec bench serve --port "${PORT}" --noreload
+exec bench serve --port "${PORT}" --host 0.0.0.0 --noreload
