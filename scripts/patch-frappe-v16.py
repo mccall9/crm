@@ -92,6 +92,18 @@ def main() -> int:
             ],
         )
 
+    document = frappe_dir / "model" / "document.py"
+    if document.exists():
+        replace_all(
+            document,
+            [
+                (
+                    'if frappe.flags.in_install == "frappe":\n\t\t\treturn',
+                    'if frappe.flags.in_install == "frappe" or (frappe.flags.in_install and not frappe.db.table_exists("Workflow")):\n\t\t\treturn',
+                ),
+            ],
+        )
+
     create_new = frappe_dir / "model" / "create_new.py"
     if create_new.exists():
         replace_all(
