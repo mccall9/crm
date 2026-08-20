@@ -64,6 +64,14 @@ fi
 
 cd "${BENCH_DIR}"
 
+# Frappe v16's special DocType JSON files omit `istable`, while meta.py
+# accesses it directly during first-site installation. Keep the bootstrap
+# compatible and idempotent without changing the CRM source tree.
+FRAPPE_META="${BENCH_DIR}/apps/frappe/frappe/model/meta.py"
+if [ -f "${FRAPPE_META}" ]; then
+  sed -i 's/self\\.istable/getattr(self, "istable", False)/g' "${FRAPPE_META}"
+fi
+
 # Keep the global app registry aligned with the app names in this repository.
 # This also removes stale entries such as the former `frappecrm` name.
 printf '%s\n' frappe crm > "${BENCH_DIR}/sites/apps.txt"
