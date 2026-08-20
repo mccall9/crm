@@ -33,13 +33,12 @@ bench set-redis-cache-host "redis://${REDIS_HOST}:${REDIS_PORT}"
 bench set-redis-queue-host "redis://${REDIS_HOST}:${REDIS_PORT}"
 bench set-redis-socketio-host "redis://${REDIS_HOST}:${REDIS_PORT}"
 
-if [ ! -d "${BENCH_DIR}/apps/crm" ]; then
-  # bench get-app expects a git URL, but the CRM app source is already
-  # available locally (copied into /workspace by the Dockerfile), so we
-  # copy it directly into the bench apps directory instead of cloning it.
-  cp -r "${APP_SOURCE}" "${BENCH_DIR}/apps/crm"
-  echo "crm" >> "${BENCH_DIR}/sites/apps.txt"
-  pip install --quiet -e "${BENCH_DIR}/apps/crm"
+if [ ! -L "${BENCH_DIR}/apps/crm" ]; then
+  # bench get-app expects a known app name or git URL, but the CRM app
+  # source is already available locally (copied into /workspace by the
+  # Dockerfile), so we link it directly into the bench apps directory
+  # instead of trying to clone it.
+  bench link-app "${APP_SOURCE}"
 fi
 
 if [ ! -f "${BENCH_DIR}/sites/${SITE_NAME}/site_config.json" ]; then
