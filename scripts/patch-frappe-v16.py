@@ -119,7 +119,7 @@ def main() -> int:
     if sequence.exists():
         replace_all(
             sequence,
-            [("if check_not_exists:\n\tquery += \" if not exists\"", "if check_not_exists and db.db_type != \"mariadb\":\n\tquery += \" if not exists\"")],
+            [("\tif check_not_exists:\n\t\tquery += \" if not exists\"", "\tif check_not_exists and db.db_type != \"mariadb\":\n\t\tquery += \" if not exists\"")],
         )
 
     mariadb_schema = frappe_dir / "database" / "mariadb" / "mysqlclient.py"
